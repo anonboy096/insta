@@ -1,51 +1,46 @@
+// server.js
+
 const express = require('express');
-const https = require('https');
+const cors = require('cors');
+const request = require('request');
 
+// Initialize Express app
 const app = express();
-const port = process.env.PORT || 3000; // Use environment variable or default port
+const port = process.env.PORT || 5000;
 
-// RapidAPI configuration
-const rapidApiKey = 'fbf81352fcmsh5248a4f09b5d605p1c1a87jsnd230527fa9b3';
-const rapidApiHost = 'instagram-scraper-api2.p.rapidapi.com';
-
-// Middleware to parse request body as JSON
+// Middleware
+app.use(cors()); // Enable CORS for frontend-backend communication
 app.use(express.json());
 
-// Route to handle Instagram user data requests
-app.get('/users/:username', (req, res) => {
+// API route to fetch Instagram user data
+app.get('/api/users/:username', (req, res) => {
   const username = req.params.username;
 
   const options = {
     method: 'GET',
-    hostname: rapidApiHost,
-    port: 443, // HTTPS uses port 443 by default
-    path: `/v1/info?username_or_id_or_url=${username}`,
+    url: 'https://instagram-scraper-api2.p.rapidapi.com/v1/info',
+    qs: { username_or_id_or_url: username },
     headers: {
-      'x-rapidapi-key': rapidApiKey,
-      'x-rapidapi-host': rapidApiHost
+      'x-rapidapi-key': 'f68befd8f3msha59f7f16fe25898p1057a6jsn1a3a7eebca21', // Replace with your actual API key
+      'x-rapidapi-host': 'instagram-scraper-api2.p.rapidapi.com'
     }
   };
 
-  https.request(options, (response) => {
-    const chunks = [];
+  request(options, function (error, response, body) {
+    if (error) {
+      return res.status(500).json({ error: 'Failed to fetch data' });
+    }
 
-    response.on('data', (chunk) => {
-      chunks.push(chunk);
-    });
-
-    response.on('end', () => {
-      const body = Buffer.concat(chunks);
-      try {
-        const jsonData = JSON.parse(body.toString());
-        res.json(jsonData); // Send the user data as JSON response
-      } catch (error) {
-        console.error('Error parsing response:', error);
-        res.status(500).json({ error: 'Failed to fetch user data' });
-      }
-    });
-  }).end();
+    try {
+      const data = JSON.parse(body);
+      res.json(data); // Return the JSON response to the frontend
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to parse data' });
+    }
+  });
 });
 
+// Start the server
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
