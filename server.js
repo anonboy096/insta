@@ -17,7 +17,7 @@ function fetchInstagramUserData(username, callback) {
         port: null,
         path: `/v1/info?username_or_id_or_url=${username}&include_about=true`,
         headers: {
-            'x-rapidapi-key': 'a848139fd8msh58ace7b19261ee6p1a36e9jsn84717f383cc5', // Replace with your actual API key
+            'x-rapidapi-key': 'f68befd8f3msha59f7f16fe25898p1057a6jsn1a3a7eebca21', // Replace with your actual API key
             'x-rapidapi-host': 'instagram-scraper-api2.p.rapidapi.com'
         }
     };
